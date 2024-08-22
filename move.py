@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from pathlib import Path
 import sys
 import shutil
@@ -6,8 +8,10 @@ import os
 help = """Usage: mv [OPTION] SOURCE(s) DESTINATION
 or: mv SOURCE(s) DESTINATION [OPTION]
 or: mv SOURCE(s) [OPTION] DESTINATION
+
 The mv program is a move file(s)/folder(s) command meant to
-make moving files/folders easier than the GNU 'mv' program.
+make renaming files/folders easier than the GNU 'mv' program.
+It can also do basic move stuff.
 
 Options:
     -f, --force     Force file/folder overwrites
@@ -44,8 +48,11 @@ class MoveFiles:
         """ The main method used to call different
             methods.
         """
+        self.source_dir = os.path.dirname(self.sources[0])
+        self.destination_dir = os.path.join(self.source_dir, self.destination)
         if not self.flags["rename"]:
             for source in self.sources:
+                # source_size = os.path
                 shutil.move(source, self.destination)
         elif self.flags["rename"]:
             self.rename()
@@ -67,17 +74,17 @@ class MoveFiles:
             raise SystemExit("Cannot rename multiple files")
 
         try:
-            original_dir = os.path.dirname(self.sources[0])
-            new_dir = os.path.join(original_dir, self.destination)
-            self.check_destination(new_dir)
-            os.rename(self.sources[0], new_dir)
+            # original_dir = os.path.dirname(self.sources[0])
+            # new_dir = os.path.join(original_dir, self.destination)
+            self.check_destination(self.destination_dir)
+            os.rename(self.sources[0], self.destination_dir)
         except FileNotFoundError:
             raise SystemExit(f"File/folder does not exist: {self.sources[0]}")
         except IsADirectoryError:
             if not self.flags["force"]:
                 raise SystemExit(f"A folder exists with the name: {self.destination}.\nUse 'mv -f -r SOURCE NEW_NAME'")
-            self.delete(new_dir)
-            os.rename(self.sources[0], new_dir)
+            self.delete(self.destination_dir)
+            os.rename(self.sources[0], self.destination_dir)
 
     def check_destination(self, destination):
         if os.path.exists(destination) and not self.flags["force"]:
